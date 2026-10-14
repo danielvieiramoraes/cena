@@ -17,12 +17,14 @@ const statusColumns = [
 ];
 const toast = document.querySelector('#toast');
 const dialog = document.querySelector('#editorDialog');
+const detailDialog = document.querySelector('#detailDialog');
 const editorForm = document.querySelector('#editorForm');
 let toastTimeout;
 let saveTimeout;
 let dragTaskId = null;
 let editorMode = 'task';
 let editTargetId = null;
+let detailTargetId = null;
 
 function localDateOffset(offset) {
   const date = new Date();
@@ -172,8 +174,8 @@ function renderBoard() {
   const board = document.querySelector('#kanbanBoard');
   board.innerHTML = statusColumns.map(column => {
     const tasks = state.tasks.filter(task => task.status === column.id && (selectedArea === 'all' || task.area === selectedArea) && `${task.title} ${task.area} ${task.detail}`.toLocaleLowerCase('pt-BR').includes(query));
-    const cards = tasks.length ? tasks.map(task => `<article class="kanban-card" draggable="true" data-task-id="${escapeHTML(task.id)}"><div class="card-topline"><span class="area-tag">${escapeHTML(task.area)}</span><span class="priority ${task.priority}"><i></i>${task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}</span></div><h3>${escapeHTML(task.title)}</h3><p>${escapeHTML(task.detail || 'Sem detalhe registrado.')}</p><div class="card-footer"><span class="due-label ${dueLabel(task.due) === 'Atrasado' ? 'overdue' : ''}">${task.due ? `Prazo · ${dueLabel(task.due)}` : 'Sem prazo'}</span><div class="card-actions"><button type="button" data-action="edit-task" data-id="${escapeHTML(task.id)}" aria-label="Editar ${escapeHTML(task.title)}">Editar</button><select data-action="move-task" data-id="${escapeHTML(task.id)}" aria-label="Mover ${escapeHTML(task.title)}">${statusColumns.map(option => `<option value="${option.id}" ${task.status === option.id ? 'selected' : ''}>${option.label}</option>`).join('')}</select><button class="delete-task" type="button" data-action="delete-task" data-id="${escapeHTML(task.id)}" aria-label="Excluir ${escapeHTML(task.title)}">×</button></div></div></article>`).join('') : '<div class="empty-column">Nenhum item nesta coluna.</div>';
-    return `<section class="kanban-column" data-status="${column.id}"><div class="column-head"><i class="column-dot ${column.id}"></i><strong>${column.label}</strong><span>${tasks.length}</span></div><div class="column-cards">${cards}</div></section>`;
+    const cards = tasks.length ? tasks.map(task => `<article class="kanban-card" draggable="true" data-task-id="${escapeHTML(task.id)}"><div class="card-topline"><span class="area-tag">${escapeHTML(task.area)}</span><span class="priority ${task.priority}"><i></i>${task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}</span></div><h3>${escapeHTML(task.title)}</h3><p>${escapeHTML(task.detail || 'Sem detalhe registrado.')}</p><div class="card-footer"><span class="due-label ${dueLabel(task.due) === 'Atrasado' ? 'overdue' : ''}">${task.due ? `Prazo · ${dueLabel(task.due)}` : 'Sem prazo'}</span><div class="card-actions"><button type="button" data-action="details-task" data-id="${escapeHTML(task.id)}">Detalhes</button><button type="button" data-action="edit-task" data-id="${escapeHTML(task.id)}">Editar</button><select data-action="move-task" data-id="${escapeHTML(task.id)}" aria-label="Mover ${escapeHTML(task.title)}">${statusColumns.map(option => `<option value="${option.id}" ${task.status === option.id ? 'selected' : ''}>${option.label}</option>`).join('')}</select><button class="delete-task" type="button" data-action="delete-task" data-id="${escapeHTML(task.id)}">Excluir</button></div></div></article>`).join('') : '<div class="empty-column">Nenhum item nesta coluna.</div>';
+    return `<section class="kanban-column" data-status="${column.id}"><div class="column-head"><i class="column-dot ${column.id}"></i><strong>${column.label}</strong><span class="column-count">${tasks.length}</span><button class="column-add" type="button" data-action="add-task" data-status="${column.id}" aria-label="Adicionar card em ${column.label}"><span aria-hidden="true">+</span> Card</button></div><div class="column-cards">${cards}</div></section>`;
   }).join('');
 }
 
@@ -220,7 +222,7 @@ function populateAreaSelects() {
   document.querySelector('#actionArea').innerHTML = `<option value="Geral">Geral</option>${options}`;
 }
 
-function openEditor(mode, item = null) {
+function openEditor(mode, item = null, defaults = {}) {
   editorMode = mode;
   editTargetId = item?.id ?? null;
   editorForm.reset();
@@ -236,13 +238,17 @@ function openEditor(mode, item = null) {
   document.querySelector('#dialogTitle').textContent = title;
   document.querySelector(`#${fieldId}`).hidden = false;
 
-  if (mode === 'task' && item) {
-    editorForm.elements.title.value = item.title;
-    editorForm.elements.area.value = item.area;
-    editorForm.elements.status.value = item.status;
-    editorForm.elements.due.value = item.due || '';
-    editorForm.elements.priority.value = item.priority;
-    editorForm.elements.detail.value = item.detail || '';
+  if (mode === 'task') {
+    if (item) {
+      editorForm.elements.title.value = item.title;
+      editorForm.elements.area.value = item.area;
+      editorForm.elements.status.value = item.status;
+      editorForm.elements.due.value = item.due || '';
+      editorForm.elements.priority.value = item.priority;
+      editorForm.elements.detail.value = item.detail || '';
+    } else {
+      editorForm.elements.status.value = defaults.status || 'request';
+    }
   } else if (mode === 'data') {
     editorForm.elements.activeWorks.value = state.keyData.activeWorks || '';
     editorForm.elements.focus.value = state.keyData.focus || '';
@@ -259,6 +265,32 @@ function openEditor(mode, item = null) {
   dialog.showModal();
   const firstInput = document.querySelector(`#${fieldId} input, #${fieldId} select`);
   firstInput?.focus({ preventScroll: true });
+}
+
+function openTaskDetails(task) {
+  detailTargetId = task.id;
+  document.querySelector('#detailTitle').textContent = task.title;
+  const status = statusColumns.find(column => column.id === task.status)?.label || 'A solicitar';
+  const priority = task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa';
+  const facts = [['Área', task.area], ['Status', status], ['Prioridade', priority], ['Prazo', task.due ? formatDate(task.due) : 'Sem prazo']];
+  document.querySelector('#detailFacts').innerHTML = facts.map(([label, value]) => `<div class="detail-fact"><span>${label}</span><strong>${escapeHTML(value)}</strong></div>`).join('');
+  document.querySelector('#detailDescription').textContent = task.detail || 'Nenhum contexto ou informação adicional registrado.';
+  detailDialog.showModal();
+}
+
+function closeTaskDetails() {
+  if (detailDialog.open) detailDialog.close();
+  detailTargetId = null;
+}
+
+function deleteTask(taskId) {
+  const task = state.tasks.find(item => item.id === taskId);
+  if (!task) return;
+  state.tasks = state.tasks.filter(item => item.id !== task.id);
+  closeTaskDetails();
+  renderAll();
+  persistState();
+  showToast('Card excluído.');
 }
 
 function closeEditor() {
@@ -336,13 +368,25 @@ document.querySelector('#boardSearch').addEventListener('input', renderBoard);
 document.querySelector('#kanbanBoard').addEventListener('click', event => {
   const control = event.target.closest('[data-action]');
   if (!control) return;
-  const task = state.tasks.find(item => item.id === control.dataset.id);
-  if (control.dataset.action === 'edit-task' && task) openEditor('task', task);
-  if (control.dataset.action === 'delete-task' && task) {
-    state.tasks = state.tasks.filter(item => item.id !== task.id);
-    renderAll(); persistState(); showToast('Item removido do kanban.');
+  if (control.dataset.action === 'add-task') {
+    openEditor('task', null, { status: control.dataset.status });
+    return;
   }
+  const task = state.tasks.find(item => item.id === control.dataset.id);
+  if (control.dataset.action === 'details-task' && task) openTaskDetails(task);
+  if (control.dataset.action === 'edit-task' && task) openEditor('task', task);
+  if (control.dataset.action === 'delete-task' && task) deleteTask(task.id);
 });
+
+document.querySelector('#closeDetail').addEventListener('click', closeTaskDetails);
+document.querySelector('#cancelDetail').addEventListener('click', closeTaskDetails);
+detailDialog.addEventListener('close', () => { detailTargetId = null; });
+document.querySelector('#editDetail').addEventListener('click', () => {
+  const task = state.tasks.find(item => item.id === detailTargetId);
+  closeTaskDetails();
+  if (task) openEditor('task', task);
+});
+document.querySelector('#deleteDetail').addEventListener('click', () => deleteTask(detailTargetId));
 
 document.querySelector('#kanbanBoard').addEventListener('change', event => {
   if (event.target.dataset.action === 'move-task') changeTaskStatus(event.target.dataset.id, event.target.value);

@@ -37,7 +37,7 @@
 
       <section class="page-intro" id="overview">
         <div><p class="eyebrow"><span class="eyebrow-line"></span> CENA · SANTA CATARINA</p><h1>Transição de gestão<span>.</span></h1><p class="intro-copy">Um lugar claro para passar contexto, responsabilidades e próximos movimentos.</p></div>
-        <button class="button button-dark" id="addTaskBtn" type="button"><span class="button-plus">+</span> Novo item de passagem</button>
+        <button class="button button-dark" id="addTaskBtn" type="button"><span class="button-plus">+</span> Adicionar card</button>
       </section>
 
       <section class="key-data" aria-label="Principais dados da transição">
@@ -104,6 +104,14 @@
       </div>
       <div class="dialog-actions"><button class="button button-quiet" type="button" id="cancelDialog">Cancelar</button><button class="button button-dark" type="submit" id="saveDialog">Salvar</button></div>
     </form>
+  </dialog>
+  <dialog class="editor-dialog detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
+    <div class="detail-content">
+      <div class="dialog-header"><div><p class="section-kicker">DETALHES DO CARD</p><h2 id="detailTitle"></h2></div><button class="dialog-close" type="button" id="closeDetail" aria-label="Fechar detalhes">×</button></div>
+      <div class="detail-facts" id="detailFacts"></div>
+      <div class="detail-description-block"><span>Contexto e informações</span><p class="detail-description" id="detailDescription"></p></div>
+      <div class="dialog-actions detail-actions"><button class="button button-delete" type="button" id="deleteDetail">Excluir</button><span class="dialog-action-spacer"></span><button class="button button-quiet" type="button" id="cancelDetail">Fechar</button><button class="button button-dark" type="button" id="editDetail">Editar card</button></div>
+    </div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>

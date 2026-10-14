@@ -129,3 +129,29 @@ h1, h2, p { margin-top: 0; }.page-intro h1 { margin: 0; font: 700 clamp(27px, 3v
 .form-field input, .form-field select, .form-field textarea { border-color: #d7e1ed; color: #344760; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #7398c6; box-shadow: 0 0 0 2px #7398c61c; }
 .toast { background: var(--forest); }
+
+.column-head .column-count { margin-left: auto; color: #8b95a3; font-size: 9px; }
+.column-add { display: inline-flex; align-items: center; gap: 3px; margin-left: 5px; padding: 3px 6px; border: 1px solid #d4deeb; border-radius: 4px; background: #f7faff; color: #516f98; cursor: pointer; font-size: 8px; font-weight: 700; white-space: nowrap; }
+.column-add:hover { border-color: #aebfda; background: #edf4fc; }
+.column-add span { font-size: 12px; font-weight: 400; }
+.card-footer { flex-wrap: wrap; }
+.card-actions { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 3px; }
+.card-actions button { padding: 4px 5px; border-radius: 3px; color: #4b668d; font-size: 8px; font-weight: 600; }
+.card-actions button:hover { background: #edf3fa; color: #203f6d; }
+.card-actions .delete-task { color: #a96553; }
+.card-actions .delete-task:hover { background: #fbefeb; color: #9b493b; }
+.card-actions select { max-width: 88px; padding: 3px 4px; border-radius: 3px; background: #f7f9fc; font-size: 8px; }
+.detail-dialog { width: min(560px, calc(100vw - 28px)); }
+.detail-content { padding: 21px; }
+.detail-content .dialog-header h2 { max-width: 450px; line-height: 1.35; }
+.detail-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 16px 0 19px; }
+.detail-fact { min-width: 0; padding: 10px; border: 1px solid #dce5f0; border-radius: 5px; background: #f5f8fc; }
+.detail-fact span, .detail-description-block > span { display: block; margin-bottom: 5px; color: #8190a5; font-size: 9px; }
+.detail-fact strong { display: block; overflow: hidden; color: #354a68; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.detail-description-block { padding: 13px 0 5px; border-top: 1px solid #e1e7ef; }
+.detail-description { min-height: 48px; margin: 0; color: #53647c; font-size: 11px; line-height: 1.7; white-space: pre-wrap; }
+.detail-actions { align-items: center; }
+.dialog-action-spacer { flex: 1; }
+.button-delete { border-color: #ead4cf; background: #fbf2ef; color: #a14e40; }
+.button-delete:hover { border-color: #ddb8ae; background: #f8e8e3; }
+@media (max-width: 420px) { .detail-content { padding: 17px; }.detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }.column-add { padding: 3px 4px; } }
