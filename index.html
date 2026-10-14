@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f3ee">
+  <title>CENA | Transição de gestão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="CENA início"><span class="brand-lockup"><span class="brand-wordmark">cena</span></span><span class="brand-tagline">GESTÃO & CONTINUIDADE</span></a>
+      <div class="side-label">TRANSIÇÃO</div>
+      <nav class="side-nav" aria-label="Navegação principal">
+        <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span> Visão geral <span class="nav-count" id="navOpenCount">0</span></a>
+        <a class="nav-link" href="#kanban"><span class="nav-icon">▦</span> Kanban de passagem</a>
+        <a class="nav-link" href="#areas"><span class="nav-icon">☷</span> Áreas & checklists</a>
+        <a class="nav-link" href="#daily"><span class="nav-icon">◷</span> Rotina diária</a>
+        <a class="nav-link" href="#horizons"><span class="nav-icon">⌁</span> Radar 30 / 60 dias</a>
+      </nav>
+      <div class="side-bottom">
+        <div class="side-note"><span class="note-spark">✳</span><strong>Passagem bem feita.</strong><p>Contexto preservado. Próximos passos visíveis.</p></div>
+        <div class="side-user"><span class="user-avatar">SC</span><span><strong>Equipe CENA</strong><small>Santa Catarina</small></span><span class="user-menu">···</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><span>/</span><strong>Transição de gestão</strong></div>
+        <div class="topbar-actions"><span class="save-state"><i></i><span id="saveState">Salvo neste dispositivo</span></span><button class="icon-button" id="exportBtn" type="button" title="Exportar cópia dos dados" aria-label="Exportar cópia dos dados">↓</button><button class="button button-quiet" id="editDataBtn" type="button">Editar dados-chave</button></div>
+      </header>
+
+      <section class="page-intro" id="overview">
+        <div><p class="eyebrow"><span class="eyebrow-line"></span> CENA · SANTA CATARINA</p><h1>Transição de gestão<span>.</span></h1><p class="intro-copy">Um lugar claro para passar contexto, responsabilidades e próximos movimentos.</p></div>
+        <button class="button button-dark" id="addTaskBtn" type="button"><span class="button-plus">+</span> Novo item de passagem</button>
+      </section>
+
+      <section class="key-data" aria-label="Principais dados da transição">
+        <div class="key-data-heading"><span class="section-kicker">PRINCIPAIS DADOS</span><span class="key-data-caption">Contexto da transição</span></div>
+        <div class="key-data-grid" id="keyDataGrid"></div>
+      </section>
+
+      <section class="summary-grid" aria-label="Resumo da transição">
+        <article class="summary-item summary-primary"><div class="summary-label">Itens em andamento <span class="summary-mark">↗</span></div><div class="summary-value" id="metricInProgress">0</div><div class="summary-foot"><span class="metric-dot lime"></span> na esteira de passagem</div></article>
+        <article class="summary-item"><div class="summary-label">Aguardando solicitação</div><div class="summary-value" id="metricToRequest">0</div><div class="summary-foot">do gestor que está saindo</div></article>
+        <article class="summary-item"><div class="summary-label">Handoff concluído</div><div class="summary-value" id="metricDone">0<span class="summary-suffix">%</span></div><div class="progress-track"><span id="completionBar"></span></div></article>
+        <article class="summary-item"><div class="summary-label">Pontos de atenção <span class="attention-count" id="attentionCount">0</span></div><div class="summary-value" id="metricAttention">0</div><div class="summary-foot"><span class="metric-dot coral"></span> próximos 30 dias</div></article>
+      </section>
+
+      <section class="board-section" id="kanban">
+        <div class="section-heading"><div><p class="section-kicker">ACOMPANHAMENTO</p><h2>Kanban de passagem</h2><p class="section-description">Do pedido ao recebimento, sem perder o fio.</p></div><div class="board-controls"><label class="select-wrap"><span class="sr-only">Filtrar por área</span><select id="areaFilter"><option value="all">Todas as áreas</option></select></label><label class="search-box"><span aria-hidden="true">⌕</span><input id="boardSearch" type="search" placeholder="Buscar item" aria-label="Buscar item"></label></div></div>
+        <div class="kanban-board" id="kanbanBoard"></div>
+      </section>
+
+      <section class="areas-section" id="areas">
+        <div class="section-heading"><div><p class="section-kicker">MEMÓRIA DE GESTÃO</p><h2>Áreas & checklists</h2><p class="section-description">Cada item registra o que solicitar e o que entregar.</p></div><span class="legend"><i class="legend-out"></i> Gestor atual <i class="legend-in"></i> Novo gestor</span></div>
+        <div class="area-grid" id="areaGrid"></div>
+      </section>
+
+      <section class="daily-section" id="daily">
+        <div class="section-heading"><div><p class="section-kicker">RITMO DA OPERAÇÃO</p><h2>O que importa hoje</h2><p class="section-description">Ações curtas para manter a transição em movimento.</p></div><button class="button button-outline" id="addActionBtn" type="button"><span class="button-plus">+</span> Adicionar ação</button></div>
+        <div class="daily-layout"><div class="daily-list" id="dailyList"></div><aside class="daily-aside"><div class="daily-aside-top"><span>CHECK-IN</span><span id="todayLabel"></span></div><strong id="dailyProgressText">0 de 0 concluídas</strong><div class="progress-track"><span id="dailyProgress"></span></div><p>Pequenas confirmações hoje evitam surpresas na virada.</p></aside></div>
+      </section>
+
+      <section class="horizon-section" id="horizons">
+        <div class="section-heading"><div><p class="section-kicker">VISÃO À FRENTE</p><h2>Radar 30 / 60 dias</h2><p class="section-description">Riscos e decisões que merecem espaço na agenda.</p></div><button class="button button-outline" id="addFocusBtn" type="button"><span class="button-plus">+</span> Registrar ponto</button></div>
+        <div class="horizon-grid" id="horizonGrid"></div>
+      </section>
+
+      <footer class="app-footer"><span>CENA · PAINEL DE TRANSIÇÃO</span><span>Atualizações salvas automaticamente neste navegador</span></footer>
+    </main>
+  </div>
+
+  <dialog class="editor-dialog" id="editorDialog">
+    <form id="editorForm" method="dialog" novalidate>
+      <div class="dialog-header"><div><p class="section-kicker" id="dialogKicker">PASSAGEM</p><h2 id="dialogTitle">Novo item de passagem</h2></div><button class="dialog-close" type="button" id="closeDialog" aria-label="Fechar">×</button></div>
+      <div class="dialog-fields" id="taskFields">
+        <label class="form-field form-wide"><span>Título do item</span><input name="title" maxlength="90" placeholder="Ex.: Conciliação de contas a pagar" required></label>
+        <label class="form-field"><span>Área</span><select name="area" id="taskArea"></select></label>
+        <label class="form-field"><span>Coluna do kanban</span><select name="status"><option value="request">A solicitar</option><option value="progress">Em andamento</option><option value="done">Entregue</option></select></label>
+        <label class="form-field"><span>Prazo</span><input name="due" type="date"></label>
+        <label class="form-field"><span>Prioridade</span><select name="priority"><option value="high">Alta</option><option value="medium" selected>Média</option><option value="low">Baixa</option></select></label>
+        <label class="form-field form-wide"><span>Contexto / detalhe a confirmar</span><textarea name="detail" rows="3" placeholder="O que precisa ser solicitado, validado ou entregue?"></textarea></label>
+      </div>
+      <div class="dialog-fields" id="dataFields" hidden>
+        <label class="form-field"><span>Obras ativas</span><input name="activeWorks" type="number" min="0" placeholder="Ex.: 8"></label>
+        <label class="form-field form-wide"><span>Foco da transição</span><input name="focus" maxlength="100" placeholder="Ex.: continuidade administrativa e financeira"></label>
+      </div>
+      <div class="dialog-fields" id="actionFields" hidden>
+        <label class="form-field form-wide"><span>Ação do dia</span><input name="actionTitle" maxlength="100" placeholder="Ex.: Confirmar alçadas de pagamento" required></label>
+        <label class="form-field"><span>Responsável</span><input name="actionOwner" placeholder="Nome ou área"></label>
+        <label class="form-field"><span>Área</span><select name="actionArea" id="actionArea"></select></label>
+      </div>
+      <div class="dialog-fields" id="focusFields" hidden>
+        <label class="form-field form-wide"><span>Ponto de atenção</span><input name="focusTitle" maxlength="100" placeholder="Ex.: Renovação de licenças do ERP" required></label>
+        <label class="form-field"><span>Horizonte</span><select name="horizon"><option value="30">Próximos 30 dias</option><option value="60">Próximos 60 dias</option></select></label>
+        <label class="form-field"><span>Responsável</span><input name="focusOwner" placeholder="Nome ou área"></label>
+        <label class="form-field form-wide"><span>Contexto</span><textarea name="focusDetail" rows="3" placeholder="Impacto, decisão pendente ou próximo passo"></textarea></label>
+      </div>
+      <div class="dialog-actions"><button class="button button-quiet" type="button" id="cancelDialog">Cancelar</button><button class="button button-dark" type="submit" id="saveDialog">Salvar</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
