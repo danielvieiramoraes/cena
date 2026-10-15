@@ -11,9 +11,10 @@ const areas = [
   { name: 'Sistemas de tecnologia', description: 'Sienge, CV e ambiente Microsoft 365.' }
 ];
 const statusColumns = [
-  { id: 'request', label: 'A solicitar' },
+  { id: 'request', label: 'Demandas' },
   { id: 'progress', label: 'Em andamento' },
-  { id: 'done', label: 'Entregue' }
+  { id: 'done', label: 'Entregues' },
+  { id: 'cancelled', label: 'Canceladas' }
 ];
 const toast = document.querySelector('#toast');
 const dialog = document.querySelector('#editorDialog');
@@ -33,7 +34,7 @@ function localDateOffset(offset) {
 }
 
 function makeTask(area, title, detail, status, dueIn, priority = 'medium') {
-  return { id: crypto.randomUUID(), area, title, detail, status, due: localDateOffset(dueIn), priority, requested: status !== 'request', received: status === 'done' };
+  return { id: crypto.randomUUID(), area, title, detail, status, due: localDateOffset(dueIn), priority, requested: !['request', 'cancelled'].includes(status), received: status === 'done' };
 }
 
 const initialState = {
@@ -153,8 +154,9 @@ function renderKeyData() {
 }
 
 function renderMetrics() {
-  const total = state.tasks.length;
-  const completed = state.tasks.filter(task => task.status === 'done').length;
+  const activeTasks = state.tasks.filter(task => task.status !== 'cancelled');
+  const total = activeTasks.length;
+  const completed = activeTasks.filter(task => task.status === 'done').length;
   const percent = total ? Math.round(completed / total * 100) : 0;
   const inProgress = state.tasks.filter(task => task.status === 'progress').length;
   const toRequest = state.tasks.filter(task => task.status === 'request').length;
@@ -182,7 +184,7 @@ function renderBoard() {
 function renderAreas() {
   const areaGrid = document.querySelector('#areaGrid');
   areaGrid.innerHTML = areas.map((area, index) => {
-    const tasks = state.tasks.filter(task => task.area === area.name);
+    const tasks = state.tasks.filter(task => task.area === area.name && task.status !== 'cancelled');
     const receivedCount = tasks.filter(task => task.received).length;
     const checklist = tasks.length ? tasks.map(task => `<div class="handoff-row"><p class="handoff-title">${escapeHTML(task.title)}</p>${task.detail ? `<p class="handoff-detail">${escapeHTML(task.detail)}</p>` : ''}<div class="handoff-toggles"><label class="handoff-check outgoing"><input type="checkbox" data-action="check-handoff" data-field="requested" data-id="${escapeHTML(task.id)}" ${task.requested ? 'checked' : ''}><span>Solicitado ao gestor atual</span></label><label class="handoff-check"><input type="checkbox" data-action="check-handoff" data-field="received" data-id="${escapeHTML(task.id)}" ${task.received ? 'checked' : ''}><span>Entregue ao novo gestor</span></label></div></div>`).join('') : '<div class="no-area-items">Adicione um item de passagem para esta área.</div>';
     return `<article class="area-card"><header class="area-card-header"><div><h3>${String(index + 1).padStart(2, '0')} · ${escapeHTML(area.name)}</h3><p>${escapeHTML(area.description)}</p></div><span class="area-progress">${receivedCount}/${tasks.length || 0}</span></header><div class="area-checklist">${checklist}</div></article>`;
@@ -309,7 +311,7 @@ function saveTask(formData) {
     due: String(formData.get('due') || ''),
     priority: String(formData.get('priority')),
     detail: String(formData.get('detail') || '').trim(),
-    requested: status !== 'request',
+    requested: !['request', 'cancelled'].includes(status),
     received: status === 'done'
   };
   if (editTargetId) Object.assign(state.tasks.find(task => task.id === editTargetId), values);
@@ -350,7 +352,7 @@ function changeTaskStatus(taskId, status) {
   const task = state.tasks.find(item => item.id === taskId);
   if (!task) return;
   task.status = status;
-  task.requested = status !== 'request';
+  task.requested = !['request', 'cancelled'].includes(status);
   task.received = status === 'done';
   renderAll();
   persistState();

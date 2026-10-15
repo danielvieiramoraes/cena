@@ -154,4 +154,10 @@ h1, h2, p { margin-top: 0; }.page-intro h1 { margin: 0; font: 700 clamp(27px, 3v
 .dialog-action-spacer { flex: 1; }
 .button-delete { border-color: #ead4cf; background: #fbf2ef; color: #a14e40; }
 .button-delete:hover { border-color: #ddb8ae; background: #f8e8e3; }
+.kanban-board { grid-template-columns: repeat(4, minmax(210px, 1fr)); overflow-x: auto; }
+.kanban-column[data-status="cancelled"] { border-color: #e4d9d8; background: #f1ebeb; }
+.kanban-column[data-status="cancelled"].drag-over { border-color: #cb9b99; background: #eee2e2; }
+.column-dot.cancelled { background: #b96d6a; }
+.kanban-column[data-status="cancelled"] .column-head strong { color: #805a59; }
+@media (max-width: 760px) { .kanban-board { grid-template-columns: repeat(4, minmax(240px, 1fr)); } }
 @media (max-width: 420px) { .detail-content { padding: 17px; }.detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }.column-add { padding: 3px 4px; } }
